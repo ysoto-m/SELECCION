@@ -41,10 +41,10 @@
   <div class="hidden bg-success bg-danger"></div>
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[16rem_1fr]">
     <!-- Sidebar -->
-    <aside class=\"border-r-0 p-4 space-y-4 bg-gradient-to-b from-slate-900 to-slate-800 text-white\">
+    <aside class="border-r-0 p-4 space-y-4 bg-gradient-to-b from-primary to-secondary text-white">
       <div>
-        <div class="text-xs uppercase tracking-wide text-white/60">Partner360 ERP</div>
-        <div class="text-xl font-bold">Talento360</div>
+        <div class="text-xl font-bold">Partner360 ERP</div>
+        <div class="text-sm text-white/70">Módulo Talento360</div>
       </div>
       <nav class="flex flex-col gap-1" id="nav">
         <button data-target="view-rq" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Solicitud RQ</button>
@@ -69,9 +69,9 @@
 
     <!-- Main -->
     <main class="min-h-screen">
-      <header class="sticky top-0 bg-white/80 backdrop-blur border-b p-4 flex items-center justify-between">
+      <header class="sticky top-0 bg-primary text-white p-4 flex items-center justify-between">
         <h1 class="text-lg font-semibold">Talento360 – Prototipo</h1>
-        <div class="text-sm text-gray-600">Solo demostración</div>
+        <div class="text-sm text-white/80">Solo demostración</div>
       </header>
       <nav id="breadcrumbs" class="px-4 pt-2 text-sm text-gray-600" aria-label="Breadcrumb"></nav>
 
@@ -571,7 +571,7 @@
         days.forEach(d=>{
           const cls=d.type==='teoria'?"bg-blue-50":"bg-green-50";
           const dateStr=d.date.toISOString().slice(0,10);
-          cells+=`<td class="p-1 text-center ${cls}"><input type="checkbox" class="attendance" data-dni="${p.dni}" data-date="${dateStr}"></td>`;
+          cells+=`<td class="p-1 text-center ${cls}"><select class="attendance border rounded p-1 text-xs" data-dni="${p.dni}" data-date="${dateStr}"><option value=""></option><option value="A">A</option><option value="F">F</option><option value="DS">DS</option></select></td>`;
         });
         cells+=`<td class="p-2 text-center font-medium" id="total-${p.dni}">0%</td>`;
         tr.innerHTML=cells;
@@ -582,33 +582,37 @@
       wrapper.appendChild(table);
     }
 
-    function updateTotals(){
-      const counts={};
-      document.querySelectorAll('.attendance').forEach(chk=>{
-        const dni=chk.dataset.dni;
-        counts[dni]=(counts[dni]||0)+(chk.checked?1:0);
-      });
-      group.participants.forEach(p=>{
-        const attended=counts[p.dni]||0;
-        const pct=Math.round((attended/days.length)*100);
-        document.getElementById(`total-${p.dni}`).textContent=`${pct}%`;
-        document.getElementById(`summary-${p.dni}`).textContent=`${pct}%`;
-      });
-    }
+      function updateTotals(){
+        const counts={};
+        document.querySelectorAll('.attendance').forEach(sel=>{
+          const dni=sel.dataset.dni;
+          const val=sel.value;
+          if(!counts[dni]) counts[dni]={A:0,DS:0};
+          if(val==='A') counts[dni].A++;
+          if(val==='DS') counts[dni].DS++;
+        });
+        group.participants.forEach(p=>{
+          const rec=counts[p.dni]||{A:0,DS:0};
+          const totalDays=days.length-rec.DS;
+          const pct=totalDays>0?Math.round((rec.A/totalDays)*100):0;
+          document.getElementById(`total-${p.dni}`).textContent=`${pct}%`;
+          document.getElementById(`summary-${p.dni}`).textContent=`${pct}%`;
+        });
+      }
 
     document.addEventListener('change',e=>{
       if(e.target.classList.contains('attendance')) updateTotals();
     });
 
-    function saveAttendance(){
-      const anyMarked=[...document.querySelectorAll('.attendance')].some(c=>c.checked);
-      if(!anyMarked){
-        showToast('Marca al menos una asistencia','error');
-        return;
+      function saveAttendance(){
+        const anyMarked=[...document.querySelectorAll('.attendance')].some(c=>c.value);
+        if(!anyMarked){
+          showToast('Marca al menos una asistencia','error');
+          return;
+        }
+        updateTotals();
+        showToast('Asistencia guardada');
       }
-      updateTotals();
-      showToast('Asistencia guardada');
-    }
     document.getElementById('btn-save-asistencia').addEventListener('click',saveAttendance);
 
     document.getElementById('btn-send-nominas').addEventListener('click',()=>{
