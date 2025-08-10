@@ -11,8 +11,6 @@
       theme: {
         extend: {
           colors: {
-            primary: '#0ea5e9',
-            secondary: '#9333ea',
             success: '#22c55e',
             warning: '#facc15',
             danger: '#ef4444'
@@ -41,10 +39,10 @@
   <div class="hidden bg-success bg-danger"></div>
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[16rem_1fr]">
     <!-- Sidebar -->
-    <aside class="border-r-0 p-4 space-y-4 bg-gradient-to-b from-primary to-secondary text-white">
+    <aside class="border-r-0 p-4 space-y-4 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       <div>
         <div class="text-xl font-bold">Partner360 ERP</div>
-        <div class="text-sm text-white/70">Módulo Talento360</div>
+        <div class="text-sm text-white/60">Módulo Talento360</div>
       </div>
       <nav class="flex flex-col gap-1" id="nav">
         <button data-target="view-rq" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Solicitud RQ</button>
@@ -69,7 +67,7 @@
 
     <!-- Main -->
     <main class="min-h-screen">
-      <header class="sticky top-0 bg-primary text-white p-4 flex items-center justify-between">
+      <header class="sticky top-0 bg-slate-900 text-white p-4 flex items-center justify-between">
         <h1 class="text-lg font-semibold">Talento360 – Prototipo</h1>
         <div class="text-sm text-white/80">Solo demostración</div>
       </header>
@@ -108,7 +106,7 @@
               <div class="md:col-span-2">
                 <label class="text-sm font-medium">Archivos adjuntos</label>
                 <div id="dropzone" class="mt-1 border-2 border-dashed rounded-xl p-4 text-center text-sm text-gray-500 cursor-pointer">
-                  Arrastra y suelta archivos o <span class="text-primary underline" id="file-trigger">selecciona</span>
+                  Arrastra y suelta archivos o <span class="text-blue-600 underline" id="file-trigger">selecciona</span>
                   <input type="file" id="file-input" multiple class="hidden" aria-label="Subir archivos" />
                 </div>
                 <ul id="file-list" class="mt-2 space-y-1 text-sm"></ul>
@@ -393,7 +391,7 @@
       window.scrollTo({top:0,behavior:'smooth'});
     }
     buttons.forEach(b=>b.addEventListener('click',()=>show(b.dataset.target)));
-    updateBreadcrumb('view-rq');
+    show('view-rq');
 
     // Toasts
     function showToast(msg,type='success'){
@@ -422,9 +420,9 @@
     ['dragover','dragleave','drop'].forEach(ev=>{
       dropzone.addEventListener(ev,e=>{
         e.preventDefault();
-        if(ev==='dragover'){dropzone.classList.add('border-primary');}
-        else if(ev==='dragleave'){dropzone.classList.remove('border-primary');}
-        else {dropzone.classList.remove('border-primary');handleFiles(e.dataTransfer.files);} 
+        if(ev==='dragover'){dropzone.classList.add('border-blue-500');}
+        else if(ev==='dragleave'){dropzone.classList.remove('border-blue-500');}
+        else {dropzone.classList.remove('border-blue-500');handleFiles(e.dataTransfer.files);}
       });
     });
     dropzone.addEventListener('click',()=>fileInput.click());
@@ -464,7 +462,7 @@
       items.forEach(a=>{
         const tr=document.createElement('tr');
         tr.className='border-t';
-        tr.innerHTML=`<td class="p-3">${a.name}</td><td class="p-3">${a.dni}</td><td class="p-3">${a.puesto}</td><td class="p-3"><a href="#" class="text-primary underline">CV.pdf</a></td><td class="p-3"><span class="pill pill--${statusClass(a.status)} flex items-center gap-1">${iconForStatus(a.status)}${a.status}</span></td><td class="p-3"><span class="pill">${a.step}</span></td><td class="p-3"><button class="px-2 py-1 text-xs rounded-lg border">Acciones</button></td>`;
+        tr.innerHTML=`<td class="p-3">${a.name}</td><td class="p-3">${a.dni}</td><td class="p-3">${a.puesto}</td><td class="p-3"><a href="#" class="text-blue-600 underline">CV.pdf</a></td><td class="p-3"><span class="pill pill--${statusClass(a.status)} flex items-center gap-1">${iconForStatus(a.status)}${a.status}</span></td><td class="p-3"><span class="pill">${a.step}</span></td><td class="p-3"><button class="px-2 py-1 text-xs rounded-lg border">Acciones</button></td>`;
         tbody.appendChild(tr);
       });
       noResults.classList.toggle('hidden',items.length>0);
