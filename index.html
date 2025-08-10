@@ -6,6 +6,24 @@
   <title>Talento360 – Prototipo HTML</title>
   <!-- Tailwind vía CDN para prototipo -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0ea5e9',
+            secondary: '#9333ea',
+            success: '#22c55e',
+            warning: '#facc15',
+            danger: '#ef4444'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
   <style>
     /* utilidades mínimas para mostrar/ocultar vistas */
     .view{display:none}
@@ -19,6 +37,8 @@
 </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+  <div class="hidden bg-success bg-danger"></div>
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[16rem_1fr]">
     <!-- Sidebar -->
     <aside class=\"border-r-0 p-4 space-y-4 bg-gradient-to-b from-slate-900 to-slate-800 text-white\">
@@ -52,6 +72,7 @@
         <h1 class="text-lg font-semibold">Talento360 – Prototipo</h1>
         <div class="text-sm text-gray-600">Solo demostración</div>
       </header>
+      <nav id="breadcrumbs" class="px-4 pt-2 text-sm text-gray-600" aria-label="Breadcrumb"></nav>
 
       <section class="p-4 space-y-6">
         <!-- ================== SOLICITUD RQ (Solicitante) ================== -->
@@ -83,9 +104,17 @@
                 <label class="text-sm font-medium">Perfil / requisitos</label>
                 <textarea class="mt-1 w-full border rounded-xl p-2" rows="3" placeholder="Experiencia en call center, manejo CRM, etc."></textarea>
               </div>
+              <div class="md:col-span-2">
+                <label class="text-sm font-medium">Archivos adjuntos</label>
+                <div id="dropzone" class="mt-1 border-2 border-dashed rounded-xl p-4 text-center text-sm text-gray-500 cursor-pointer">
+                  Arrastra y suelta archivos o <span class="text-primary underline" id="file-trigger">selecciona</span>
+                  <input type="file" id="file-input" multiple class="hidden" aria-label="Subir archivos" />
+                </div>
+                <ul id="file-list" class="mt-2 space-y-1 text-sm"></ul>
+              </div>
               <div class="md:col-span-2 flex gap-2">
-                <button type="button" class="px-4 py-2 rounded-xl border">Guardar borrador</button>
-                <button type="button" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Enviar a Selección</button>
+                <button type="button" id="btn-save" class="px-4 py-2 rounded-xl border">Guardar borrador</button>
+                <button type="button" id="btn-send" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Enviar a Selección</button>
               </div>
             </form>
 
@@ -106,12 +135,18 @@
           <div class="space-y-3">
             <h2 class="text-xl font-bold">Postulantes</h2>
             <div class="flex flex-wrap items-center gap-2">
-              <select class="border rounded-xl p-2 text-sm">
+              <select id="rq-select" class="border rounded-xl p-2 text-sm">
                 <option>RQ G1-001</option>
                 <option>RQ G1-002</option>
               </select>
-              <input class="border rounded-xl p-2 text-sm" placeholder="Buscar por nombre o DNI" />
-              <span class="pill">Total: 4</span>
+              <input id="postulante-search" class="border rounded-xl p-2 text-sm" placeholder="Buscar por nombre o DNI" />
+              <select id="postulante-status" class="border rounded-xl p-2 text-sm">
+                <option value="">Todos</option>
+                <option>Pendiente</option>
+                <option>Aprobado</option>
+                <option>Rechazado</option>
+              </select>
+              <span id="total-postulantes" class="pill">Total: 0</span>
             </div>
             <div class="overflow-auto rounded-2xl border bg-white">
               <table class="min-w-full text-sm">
@@ -122,40 +157,15 @@
                     <th class="text-left p-3">Puesto</th>
                     <th class="text-left p-3">CV</th>
                     <th class="text-left p-3">Estado</th>
+                    <th class="text-left p-3">Paso</th>
                     <th class="text-left p-3">Acciones (Selección)</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr class="border-t">
-                    <td class="p-3">María Pérez</td>
-                    <td class="p-3">88888888</td>
-                    <td class="p-3">Agente Portabilidad</td>
-                    <td class="p-3"><a href="#" class="text-blue-600 underline">CV.pdf</a></td>
-                    <td class="p-3"><span class=\"pill pill--info\">Nuevo</span></td>
-                    <td class="p-3">
-                      <div class="flex gap-2">
-                        <button class="px-2 py-1 text-xs rounded-lg border">Entrevista</button>
-                        <button class="px-2 py-1 text-xs rounded-lg border">Alta directa</button>
-                        <button class="px-2 py-1 text-xs rounded-lg border">A Formación</button>
-                        <button class="px-2 py-1 text-xs rounded-lg border">Blacklist</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr class="border-t">
-                    <td class="p-3">Luis Rojas</td>
-                    <td class="p-3">09915156</td>
-                    <td class="p-3">Agente Portabilidad</td>
-                    <td class="p-3"><a href="#" class="text-blue-600 underline">CV.pdf</a></td>
-                    <td class="p-3"><span class="pill bg-red-50 border-red-300 text-red-700">En Blacklist</span></td>
-                    <td class="p-3">
-                      <div class="flex gap-2">
-                        <button class="px-2 py-1 text-xs rounded-lg border" disabled>Acciones</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="postulante-body"></tbody>
               </table>
+              <div id="no-results" class="p-4 text-center text-sm text-gray-500 hidden">No se encontraron postulantes.</div>
             </div>
+            <div id="pagination" class="flex items-center gap-2 text-sm"></div>
           </div>
         </div>
 
@@ -305,28 +315,28 @@
                   <tbody>
                     <tr class="border-t">
                       <td class="p-2">Semana 1</td>
-                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2 bg-blue-50"><input type="checkbox" checked/></td>
                       <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2 bg-blue-50"><input type="checkbox" checked/></td>
                       <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2 bg-green-50"><input type="checkbox"/></td>
                       <td class="p-2"><input type="checkbox"/></td>
                       <td class="p-2"><input type="checkbox"/></td>
                     </tr>
                     <tr class="border-t">
                       <td class="p-2">Semana 2</td>
                       <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2 bg-green-50"><input type="checkbox" checked/></td>
                       <td class="p-2"><input type="checkbox"/></td>
                       <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2 bg-green-50"><input type="checkbox" checked/></td>
                       <td class="p-2"><input type="checkbox"/></td>
                       <td class="p-2"><input type="checkbox"/></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <button class="mt-3 px-4 py-2 rounded-xl border">Guardar asistencia</button>
+              <button id="btn-save-asistencia" class="mt-3 px-4 py-2 rounded-xl border">Guardar asistencia</button>
             </div>
           </div>
         </div>
@@ -370,15 +380,130 @@
     // navegación simple entre vistas
     const buttons = document.querySelectorAll('#nav [data-target]');
     const views = document.querySelectorAll('.view');
+    const breadcrumbs = document.getElementById('breadcrumbs');
+    const breadcrumbMap = {
+      'view-rq': ['Solicitante','Solicitud RQ'],
+      'view-postulantes': ['Selección','Postulantes'],
+      'view-blacklist': ['Selección','Blacklist'],
+      'view-formacion-seleccion': ['Selección','Formación'],
+      'view-formador': ['Formador','Asistencias'],
+      'view-nominas': ['Nóminas / Contabilidad']
+    };
+    function updateBreadcrumb(id){
+      const trail = breadcrumbMap[id] || [];
+      breadcrumbs.innerHTML = trail.map((t,i)=> i<trail.length-1
+        ? `<span class="text-gray-500">${t}</span><span class="mx-1">/</span>`
+        : `<span class="font-medium text-gray-900">${t}</span>`
+      ).join('');
+    }
     function show(id){
       views.forEach(v=>v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       buttons.forEach(b=>b.classList.remove('bg-blue-600','text-white'));
       const btn=[...buttons].find(b=>b.dataset.target===id);
       if(btn){ btn.classList.add('bg-blue-600','text-white'); }
+      updateBreadcrumb(id);
       window.scrollTo({top:0,behavior:'smooth'});
     }
     buttons.forEach(b=>b.addEventListener('click',()=>show(b.dataset.target)));
+    updateBreadcrumb('view-rq');
+
+    // Toasts
+    function showToast(msg,type='success'){
+      const el=document.createElement('div');
+      el.className=`px-4 py-2 rounded-xl text-white shadow ${type==='error'?'bg-danger':'bg-success'}`;
+      el.textContent=msg;
+      document.getElementById('toast-container').appendChild(el);
+      setTimeout(()=>el.remove(),3000);
+    }
+    document.getElementById('btn-save').addEventListener('click',()=>showToast('Borrador guardado'));
+    document.getElementById('btn-send').addEventListener('click',()=>showToast('Enviado a Selección'));
+    document.getElementById('btn-save-asistencia').addEventListener('click',()=>showToast('Asistencia guardada'));
+
+    // Drag & drop archivos
+    const dropzone=document.getElementById('dropzone');
+    const fileInput=document.getElementById('file-input');
+    const fileTrigger=document.getElementById('file-trigger');
+    const fileList=document.getElementById('file-list');
+    function handleFiles(files){
+      fileList.innerHTML='';
+      [...files].forEach(f=>{
+        const li=document.createElement('li');
+        li.textContent=f.name;
+        fileList.appendChild(li);
+      });
+    }
+    ['dragover','dragleave','drop'].forEach(ev=>{
+      dropzone.addEventListener(ev,e=>{
+        e.preventDefault();
+        if(ev==='dragover'){dropzone.classList.add('border-primary');}
+        else if(ev==='dragleave'){dropzone.classList.remove('border-primary');}
+        else {dropzone.classList.remove('border-primary');handleFiles(e.dataTransfer.files);} 
+      });
+    });
+    dropzone.addEventListener('click',()=>fileInput.click());
+    fileTrigger.addEventListener('click',e=>{e.preventDefault();fileInput.click();});
+    fileInput.addEventListener('change',()=>handleFiles(fileInput.files));
+
+    // Datos fake de postulantes
+    const applicants=[];
+    const estados=['Pendiente','Aprobado','Rechazado'];
+    const pasos=['Entrevista','OJT','Alta'];
+    for(let i=1;i<=25;i++){
+      applicants.push({
+        name:`Postulante ${i}`,
+        dni:String(10000000+i),
+        puesto:'Agente Portabilidad',
+        status:estados[Math.floor(Math.random()*3)],
+        step:pasos[Math.floor(Math.random()*3)]
+      });
+    }
+    const perPage=5; let page=1;
+    const searchInput=document.getElementById('postulante-search');
+    const statusSelect=document.getElementById('postulante-status');
+    const tbody=document.getElementById('postulante-body');
+    const totalSpan=document.getElementById('total-postulantes');
+    const noResults=document.getElementById('no-results');
+    const pagination=document.getElementById('pagination');
+    function statusClass(s){return s==='Aprobado'?'success':s==='Rechazado'?'danger':'info';}
+    function iconForStatus(s){const icons={Pendiente:'⏳',Aprobado:'✔️',Rechazado:'✖️'};return `<span aria-hidden="true">${icons[s]}</span>`;}
+    function render(){
+      const term=searchInput.value.toLowerCase();
+      const st=statusSelect.value;
+      let filtered=applicants.filter(a=>(a.name.toLowerCase().includes(term)||a.dni.includes(term)) && (!st||a.status===st));
+      totalSpan.textContent=`Total: ${filtered.length}`;
+      const start=(page-1)*perPage;
+      const items=filtered.slice(start,start+perPage);
+      tbody.innerHTML='';
+      items.forEach(a=>{
+        const tr=document.createElement('tr');
+        tr.className='border-t';
+        tr.innerHTML=`<td class="p-3">${a.name}</td><td class="p-3">${a.dni}</td><td class="p-3">${a.puesto}</td><td class="p-3"><a href="#" class="text-primary underline">CV.pdf</a></td><td class="p-3"><span class="pill pill--${statusClass(a.status)} flex items-center gap-1">${iconForStatus(a.status)}${a.status}</span></td><td class="p-3"><span class="pill">${a.step}</span></td><td class="p-3"><button class="px-2 py-1 text-xs rounded-lg border">Acciones</button></td>`;
+        tbody.appendChild(tr);
+      });
+      noResults.classList.toggle('hidden',items.length>0);
+      renderPagination(filtered.length);
+    }
+    function renderPagination(total){
+      const pages=Math.ceil(total/perPage);
+      pagination.innerHTML='';
+      if(pages<=1) return;
+      const prev=document.createElement('button');
+      prev.className='px-2 py-1 border rounded disabled:opacity-50';
+      prev.textContent='Anterior';
+      prev.disabled=page===1;
+      prev.addEventListener('click',()=>{page--;render();});
+      pagination.appendChild(prev);
+      const next=document.createElement('button');
+      next.className='px-2 py-1 border rounded disabled:opacity-50';
+      next.textContent='Siguiente';
+      next.disabled=page===pages;
+      next.addEventListener('click',()=>{page++;render();});
+      pagination.appendChild(next);
+    }
+    searchInput.addEventListener('input',()=>{page=1;render();});
+    statusSelect.addEventListener('change',()=>{page=1;render();});
+    render();
   </script>
 </body>
 </html>
