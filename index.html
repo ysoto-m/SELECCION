@@ -289,7 +289,7 @@
         <div id="view-formador" class="view">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-xl font-bold">G1-Portabilidad-2025 • Módulo de Formación</h2>
-            <button class="px-4 py-2 rounded-xl bg-blue-600 text-white">Finalizar grupo y enviar a Nóminas</button>
+            <button id="btn-send-nominas" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Finalizar grupo y enviar a Nóminas</button>
           </div>
           <div class="grid gap-4">
             <div class="bg-white rounded-2xl border p-4">
@@ -309,54 +309,19 @@
                       <th class="text-left p-2">Asistencia acumulada</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr class="border-t"><td class="p-2">Laura Torres</td><td class="p-2">44556677</td><td class="p-2">Activo</td><td class="p-2">100%</td></tr>
-                    <tr class="border-t"><td class="p-2">Javier Ríos</td><td class="p-2">66779901</td><td class="p-2">Activo</td><td class="p-2">95%</td></tr>
-                    <tr class="border-t"><td class="p-2">Silvia Castro</td><td class="p-2">77889012</td><td class="p-2">Activo</td><td class="p-2">—</td></tr>
-                  </tbody>
+                  <tbody id="participant-summary"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- Calendario de asistencia simplificado -->
+            <!-- Calendario de asistencia dinámico -->
             <div class="bg-white rounded-2xl border p-4">
               <div class="font-semibold mb-2">Calendario de asistencia</div>
               <div class="flex items-center gap-3 text-xs mb-3">
-                <span class=\"pill pill--info\">Día de teoría</span>
-                <span class=\"pill pill--success\">Día OJT</span>
+                <span class="pill pill--info flex items-center gap-1"><span aria-hidden="true">📘</span>Teoría</span>
+                <span class="pill pill--success flex items-center gap-1"><span aria-hidden="true">💼</span>OJT</span>
               </div>
-              <div class="overflow-auto">
-                <table class="min-w-full text-sm">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="p-2 text-left">Fecha</th>
-                      <th class="p-2">L</th><th class="p-2">M</th><th class="p-2">X</th><th class="p-2">J</th><th class="p-2">V</th><th class="p-2">S</th><th class="p-2">D</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="border-t">
-                      <td class="p-2">Semana 1</td>
-                      <td class="p-2 bg-blue-50"><input type="checkbox" checked/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2 bg-blue-50"><input type="checkbox" checked/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2 bg-green-50"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                    </tr>
-                    <tr class="border-t">
-                      <td class="p-2">Semana 2</td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2 bg-green-50"><input type="checkbox" checked/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2 bg-green-50"><input type="checkbox" checked/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                      <td class="p-2"><input type="checkbox"/></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <div class="overflow-auto" id="attendance-wrapper"></div>
               <button id="btn-save-asistencia" class="mt-3 px-4 py-2 rounded-xl border">Guardar asistencia</button>
             </div>
           </div>
@@ -440,7 +405,6 @@
     }
     document.getElementById('btn-save').addEventListener('click',()=>showToast('Borrador guardado'));
     document.getElementById('btn-send').addEventListener('click',()=>showToast('Enviado a Selección'));
-    document.getElementById('btn-save-asistencia').addEventListener('click',()=>showToast('Asistencia guardada'));
 
     // Drag & drop archivos
     const dropzone=document.getElementById('dropzone');
@@ -551,6 +515,110 @@
         showToast('RQ asignada','success');
       }
     });
+
+    // ================== Asistencia dinámica ==================
+    const group={
+      start:new Date('2025-05-02'),
+      theoryDays:10,
+      ojtDays:7,
+      participants:[
+        {name:'Laura Torres',dni:'44556677'},
+        {name:'Javier Ríos',dni:'66779901'},
+        {name:'Silvia Castro',dni:'77889012'}
+      ]
+    };
+    group.totalDays=group.theoryDays+group.ojtDays;
+
+    function generateDays(){
+      const arr=[];
+      let current=new Date(group.start);
+      for(let i=0;i<group.totalDays;i++){
+        arr.push({date:new Date(current),type:i<group.theoryDays?'teoria':'ojt'});
+        current.setDate(current.getDate()+1);
+      }
+      return arr;
+    }
+    const days=generateDays();
+
+    function renderSummary(){
+      const body=document.getElementById('participant-summary');
+      body.innerHTML='';
+      group.participants.forEach(p=>{
+        const tr=document.createElement('tr');
+        tr.className='border-t';
+        tr.innerHTML=`<td class="p-2">${p.name}</td><td class="p-2">${p.dni}</td><td class="p-2">Activo</td><td class="p-2" id="summary-${p.dni}">0%</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderCalendar(){
+      const wrapper=document.getElementById('attendance-wrapper');
+      const table=document.createElement('table');
+      table.className='min-w-full text-xs';
+      const thead=document.createElement('thead');
+      thead.innerHTML='<tr><th class="p-2 text-left">Participante</th>'+
+        days.map(d=>{
+          const cls=d.type==='teoria'?"bg-blue-50 text-blue-700":"bg-green-50 text-green-700";
+          return `<th class="p-2 text-center ${cls}">${d.date.getDate()}</th>`;
+        }).join('')+
+        '<th class="p-2 text-center">Total</th></tr>';
+      table.appendChild(thead);
+      const tbody=document.createElement('tbody');
+      group.participants.forEach(p=>{
+        const tr=document.createElement('tr');
+        tr.className='border-t';
+        let cells=`<td class="p-2 whitespace-nowrap">${p.name}</td>`;
+        days.forEach(d=>{
+          const cls=d.type==='teoria'?"bg-blue-50":"bg-green-50";
+          const dateStr=d.date.toISOString().slice(0,10);
+          cells+=`<td class="p-1 text-center ${cls}"><input type="checkbox" class="attendance" data-dni="${p.dni}" data-date="${dateStr}"></td>`;
+        });
+        cells+=`<td class="p-2 text-center font-medium" id="total-${p.dni}">0%</td>`;
+        tr.innerHTML=cells;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrapper.innerHTML='';
+      wrapper.appendChild(table);
+    }
+
+    function updateTotals(){
+      const counts={};
+      document.querySelectorAll('.attendance').forEach(chk=>{
+        const dni=chk.dataset.dni;
+        counts[dni]=(counts[dni]||0)+(chk.checked?1:0);
+      });
+      group.participants.forEach(p=>{
+        const attended=counts[p.dni]||0;
+        const pct=Math.round((attended/days.length)*100);
+        document.getElementById(`total-${p.dni}`).textContent=`${pct}%`;
+        document.getElementById(`summary-${p.dni}`).textContent=`${pct}%`;
+      });
+    }
+
+    document.addEventListener('change',e=>{
+      if(e.target.classList.contains('attendance')) updateTotals();
+    });
+
+    function saveAttendance(){
+      const anyMarked=[...document.querySelectorAll('.attendance')].some(c=>c.checked);
+      if(!anyMarked){
+        showToast('Marca al menos una asistencia','error');
+        return;
+      }
+      updateTotals();
+      showToast('Asistencia guardada');
+    }
+    document.getElementById('btn-save-asistencia').addEventListener('click',saveAttendance);
+
+    document.getElementById('btn-send-nominas').addEventListener('click',()=>{
+      updateTotals();
+      showToast('Grupo enviado a Nóminas');
+    });
+
+    renderSummary();
+    renderCalendar();
+    updateTotals();
   </script>
 </body>
 </html>
