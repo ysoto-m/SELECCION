@@ -49,6 +49,7 @@
       <nav class="flex flex-col gap-1" id="nav">
         <button data-target="view-rq" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Solicitud RQ</button>
         <button data-target="view-postulantes" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Postulantes</button>
+        <button data-target="view-asignar-seleccion" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Asignar Selección</button>
         <button data-target="view-blacklist" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Blacklist (Selección)</button>
         <button data-target="view-formacion-seleccion" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Formación (Selección)</button>
         <button data-target="view-formador" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Formación (Formador)</button>
@@ -166,6 +167,26 @@
               <div id="no-results" class="p-4 text-center text-sm text-gray-500 hidden">No se encontraron postulantes.</div>
             </div>
             <div id="pagination" class="flex items-center gap-2 text-sm"></div>
+          </div>
+        </div>
+
+        <!-- ================== ASIGNAR RQ (Selección) ================== -->
+        <div id="view-asignar-seleccion" class="view">
+          <div class="space-y-3">
+            <h2 class="text-xl font-bold">Asignar RQ</h2>
+            <div class="overflow-auto rounded-2xl border bg-white">
+              <table class="min-w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="text-left p-3">Código</th>
+                    <th class="text-left p-3">Puesto</th>
+                    <th class="text-left p-3">Reclutador</th>
+                    <th class="text-left p-3">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="asignar-rq-body"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -381,14 +402,15 @@
     const buttons = document.querySelectorAll('#nav [data-target]');
     const views = document.querySelectorAll('.view');
     const breadcrumbs = document.getElementById('breadcrumbs');
-    const breadcrumbMap = {
-      'view-rq': ['Solicitante','Solicitud RQ'],
-      'view-postulantes': ['Selección','Postulantes'],
-      'view-blacklist': ['Selección','Blacklist'],
-      'view-formacion-seleccion': ['Selección','Formación'],
-      'view-formador': ['Formador','Asistencias'],
-      'view-nominas': ['Nóminas / Contabilidad']
-    };
+      const breadcrumbMap = {
+        'view-rq': ['Solicitante','Solicitud RQ'],
+        'view-postulantes': ['Selección','Postulantes'],
+        'view-asignar-seleccion': ['Selección','Asignar RQ'],
+        'view-blacklist': ['Selección','Blacklist'],
+        'view-formacion-seleccion': ['Selección','Formación'],
+        'view-formador': ['Formador','Asistencias'],
+        'view-nominas': ['Nóminas / Contabilidad']
+      };
     function updateBreadcrumb(id){
       const trail = breadcrumbMap[id] || [];
       breadcrumbs.innerHTML = trail.map((t,i)=> i<trail.length-1
@@ -504,6 +526,31 @@
     searchInput.addEventListener('input',()=>{page=1;render();});
     statusSelect.addEventListener('change',()=>{page=1;render();});
     render();
+
+    // Asignación de RQ a reclutadores
+    const rqs=[
+      {code:'RQ G1-001',puesto:'Agente Portabilidad'},
+      {code:'RQ G1-002',puesto:'Supervisor Ventas'},
+      {code:'RQ G1-003',puesto:'Back Office'}
+    ];
+    const recruiters=['Ana López','Carlos Díaz','María Gómez'];
+    const asignarBody=document.getElementById('asignar-rq-body');
+    function renderAsignar(){
+      asignarBody.innerHTML='';
+      rqs.forEach((rq)=>{
+        const tr=document.createElement('tr');
+        tr.className='border-t';
+        const options=recruiters.map(r=>`<option>${r}</option>`).join('');
+        tr.innerHTML=`<td class="p-3">${rq.code}</td><td class="p-3">${rq.puesto}</td><td class="p-3"><select class="border rounded-xl p-2 text-sm" aria-label="Reclutador"><option value="">Seleccionar</option>${options}</select></td><td class="p-3"><button class="px-2 py-1 text-xs rounded-lg border btn-assign">Asignar</button></td>`;
+        asignarBody.appendChild(tr);
+      });
+    }
+    renderAsignar();
+    asignarBody.addEventListener('click',e=>{
+      if(e.target.classList.contains('btn-assign')){
+        showToast('RQ asignada','success');
+      }
+    });
   </script>
 </body>
 </html>
