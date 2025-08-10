@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talento360 – Prototipo HTML</title>
+  <!-- Tailwind vía CDN para prototipo -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* utilidades mínimas para mostrar/ocultar vistas */
+    .view{display:none}
+    .view.active{display:block}
+    .pill{border:1px solid #e5e7eb;border-radius:9999px;padding:.15rem .5rem;font-size:.70rem}
+    /* Paleta y badges */
+  .pill--info{border-color:rgb(147 197 253);background:rgb(239 246 255);color:rgb(30 64 175)}
+  .pill--success{border-color:rgb(134 239 172);background:rgb(240 253 244);color:rgb(22 101 52)}
+  .pill--warning{border-color:rgb(251 191 36);background:rgb(254 243 199);color:rgb(146 64 14)}
+  .pill--danger{border-color:rgb(248 113 113);background:rgb(254 242 242);color:rgb(153 27 27)}
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[16rem_1fr]">
+    <!-- Sidebar -->
+    <aside class=\"border-r-0 p-4 space-y-4 bg-gradient-to-b from-slate-900 to-slate-800 text-white\">
+      <div>
+        <div class="text-xs uppercase tracking-wide text-white/60">Partner360 ERP</div>
+        <div class="text-xl font-bold">Talento360</div>
+      </div>
+      <nav class="flex flex-col gap-1" id="nav">
+        <button data-target="view-rq" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Solicitud RQ</button>
+        <button data-target="view-postulantes" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Postulantes</button>
+        <button data-target="view-blacklist" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Blacklist (Selección)</button>
+        <button data-target="view-formacion-seleccion" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Formación (Selección)</button>
+        <button data-target="view-formador" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Formación (Formador)</button>
+        <button data-target="view-nominas" class="px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/90 font-medium">Nóminas / Contabilidad</button>
+      </nav>
+      <div class="mt-6 text-xs text-gray-600">
+        <div class="font-semibold mb-1">Flujo</div>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Solicitante crea RQ</li>
+          <li>Selección publica y gestiona</li>
+          <li>Blacklist solo Selección</li>
+          <li>Ingreso directo → Nóminas</li>
+          <li>O asigna Formador → Asistencia → Nóminas</li>
+        </ol>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="min-h-screen">
+      <header class="sticky top-0 bg-white/80 backdrop-blur border-b p-4 flex items-center justify-between">
+        <h1 class="text-lg font-semibold">Talento360 – Prototipo</h1>
+        <div class="text-sm text-gray-600">Solo demostración</div>
+      </header>
+
+      <section class="p-4 space-y-6">
+        <!-- ================== SOLICITUD RQ (Solicitante) ================== -->
+        <div id="view-rq" class="view active">
+          <div class="max-w-5xl mx-auto space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold">Solicitud RQ</h2>
+              <span class="pill">Estado: Borrador</span>
+            </div>
+
+            <form class="grid gap-4 md:grid-cols-2 bg-white p-4 rounded-2xl border shadow-sm">
+              <div>
+                <label class="text-sm font-medium">Puesto</label>
+                <input class="mt-1 w-full border rounded-xl p-2" placeholder="Agente Portabilidad" />
+              </div>
+              <div>
+                <label class="text-sm font-medium">Cantidad de vacantes</label>
+                <input type="number" class="mt-1 w-full border rounded-xl p-2" value="5" />
+              </div>
+              <div>
+                <label class="text-sm font-medium">Sede</label>
+                <input class="mt-1 w-full border rounded-xl p-2" placeholder="Lima" />
+              </div>
+              <div>
+                <label class="text-sm font-medium">Modalidad</label>
+                <select class="mt-1 w-full border rounded-xl p-2"><option>Presencial</option><option>Híbrido</option><option>Remoto</option></select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="text-sm font-medium">Perfil / requisitos</label>
+                <textarea class="mt-1 w-full border rounded-xl p-2" rows="3" placeholder="Experiencia en call center, manejo CRM, etc."></textarea>
+              </div>
+              <div class="md:col-span-2 flex gap-2">
+                <button type="button" class="px-4 py-2 rounded-xl border">Guardar borrador</button>
+                <button type="button" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Enviar a Selección</button>
+              </div>
+            </form>
+
+            <div class="max-w-5xl mx-auto">
+              <h3 class="font-semibold mb-2">Publicaciones (cargadas por Selección)</h3>
+              <div class="bg-white p-4 rounded-2xl border">
+                <ul class="list-disc pl-5 text-sm space-y-1">
+                  <li><b>Computrabajo:</b> <a href="#" class="text-blue-600 underline">https://…/G1-portabilidad</a></li>
+                  <li><b>Bumeran:</b> <a href="#" class="text-blue-600 underline">https://…/G1-portabilidad</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================== POSTULANTES (Selección/Solicitante lectura) ================== -->
+        <div id="view-postulantes" class="view">
+          <div class="space-y-3">
+            <h2 class="text-xl font-bold">Postulantes</h2>
+            <div class="flex flex-wrap items-center gap-2">
+              <select class="border rounded-xl p-2 text-sm">
+                <option>RQ G1-001</option>
+                <option>RQ G1-002</option>
+              </select>
+              <input class="border rounded-xl p-2 text-sm" placeholder="Buscar por nombre o DNI" />
+              <span class="pill">Total: 4</span>
+            </div>
+            <div class="overflow-auto rounded-2xl border bg-white">
+              <table class="min-w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="text-left p-3">Nombre</th>
+                    <th class="text-left p-3">DNI</th>
+                    <th class="text-left p-3">Puesto</th>
+                    <th class="text-left p-3">CV</th>
+                    <th class="text-left p-3">Estado</th>
+                    <th class="text-left p-3">Acciones (Selección)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t">
+                    <td class="p-3">María Pérez</td>
+                    <td class="p-3">88888888</td>
+                    <td class="p-3">Agente Portabilidad</td>
+                    <td class="p-3"><a href="#" class="text-blue-600 underline">CV.pdf</a></td>
+                    <td class="p-3"><span class=\"pill pill--info\">Nuevo</span></td>
+                    <td class="p-3">
+                      <div class="flex gap-2">
+                        <button class="px-2 py-1 text-xs rounded-lg border">Entrevista</button>
+                        <button class="px-2 py-1 text-xs rounded-lg border">Alta directa</button>
+                        <button class="px-2 py-1 text-xs rounded-lg border">A Formación</button>
+                        <button class="px-2 py-1 text-xs rounded-lg border">Blacklist</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-t">
+                    <td class="p-3">Luis Rojas</td>
+                    <td class="p-3">09915156</td>
+                    <td class="p-3">Agente Portabilidad</td>
+                    <td class="p-3"><a href="#" class="text-blue-600 underline">CV.pdf</a></td>
+                    <td class="p-3"><span class="pill bg-red-50 border-red-300 text-red-700">En Blacklist</span></td>
+                    <td class="p-3">
+                      <div class="flex gap-2">
+                        <button class="px-2 py-1 text-xs rounded-lg border" disabled>Acciones</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================== BLACKLIST (Solo Selección) ================== -->
+        <div id="view-blacklist" class="view">
+          <h2 class="text-xl font-bold mb-4">Blacklist (Gestión – Selección)</h2>
+          <div class="grid gap-4 md:grid-cols-2">
+            <!-- listado -->
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="font-semibold">Registros</div>
+                <input class="border rounded-xl p-2 text-sm" placeholder="Buscar DNI / nombre" />
+              </div>
+              <table class="min-w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="text-left p-2">DNI</th>
+                    <th class="text-left p-2">Nombre</th>
+                    <th class="text-left p-2">Motivo</th>
+                    <th class="text-left p-2">Fecha</th>
+                    <th class="text-left p-2">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t">
+                    <td class="p-2">09915156</td>
+                    <td class="p-2">Luis Rojas</td>
+                    <td class="p-2">Incumplimiento horario</td>
+                    <td class="p-2">10/02/2024</td>
+                    <td class="p-2"><button class="px-2 py-1 text-xs rounded-lg border">Quitar</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- formulario agregar -->
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="font-semibold mb-3">Agregar a Blacklist</div>
+              <form class="grid gap-3">
+                <input class="border rounded-xl p-2" placeholder="DNI" />
+                <input class="border rounded-xl p-2" placeholder="Nombre completo" />
+                <input class="border rounded-xl p-2" placeholder="Correo (opcional)" />
+                <input class="border rounded-xl p-2" placeholder="Teléfono (opcional)" />
+                <textarea class="border rounded-xl p-2" rows="3" placeholder="Motivo"></textarea>
+                <input class="border rounded-xl p-2" type="date" value="2025-08-05" />
+                <button type="button" class="px-4 py-2 rounded-xl bg-blue-600 text-white w-fit">Agregar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================== FORMACIÓN (Selección define grupos) ================== -->
+        <div id="view-formacion-seleccion" class="view">
+          <h2 class="text-xl font-bold mb-3">Formación – Configuración (Selección)</h2>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="font-semibold mb-2">Grupos existentes</div>
+              <table class="min-w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="text-left p-2">Grupo</th>
+                    <th class="text-left p-2">Formador</th>
+                    <th class="text-left p-2">Inicio</th>
+                    <th class="text-left p-2">Fin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t">
+                    <td class="p-2">G1-Portabilidad-2025</td>
+                    <td class="p-2">Marta Sánchez</td>
+                    <td class="p-2">2025-05-02</td>
+                    <td class="p-2">2025-06-20</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="font-semibold mb-2">Crear grupo</div>
+              <form class="grid gap-3 md:grid-cols-2">
+                <input class="border rounded-xl p-2 md:col-span-2" placeholder="Nombre del grupo (Gx-Servicio-Año)" value="G2-Migraciones-2025"/>
+                <input class="border rounded-xl p-2" type="number" placeholder="Días teóricos" value="10" />
+                <input class="border rounded-xl p-2" type="number" placeholder="Días OJT" value="5" />
+                <input class="border rounded-xl p-2" type="number" placeholder="Pago por día teoría" value="60" />
+                <input class="border rounded-xl p-2" type="number" placeholder="Pago por día OJT" value="50" />
+                <select class="border rounded-xl p-2 md:col-span-2">
+                  <option>Seleccionar formador</option>
+                  <option>Marta Sánchez</option>
+                  <option>Juan Díaz</option>
+                </select>
+                <div class="md:col-span-2 flex gap-2">
+                  <input class="border rounded-xl p-2" type="date" value="2025-08-10" />
+                  <input class="border rounded-xl p-2" type="date" value="2025-08-24" />
+                </div>
+                <button type="button" class="px-4 py-2 rounded-xl bg-blue-600 text-white w-fit md:col-span-2">Crear grupo</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================== FORMACIÓN (Vista del Formador) ================== -->
+        <div id="view-formador" class="view">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-bold">G1-Portabilidad-2025 • Módulo de Formación</h2>
+            <button class="px-4 py-2 rounded-xl bg-blue-600 text-white">Finalizar grupo y enviar a Nóminas</button>
+          </div>
+          <div class="grid gap-4">
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="flex flex-wrap items-center gap-4 text-sm">
+                <span><b>Periodo:</b> 02/05/2025 – 20/06/2025</span>
+                <span><b>Días teóricos:</b> 10</span>
+                <span><b>Días OJT:</b> 7</span>
+                <span><b>Pago por día:</b> S/. 120.00</span>
+              </div>
+              <div class="mt-3 overflow-auto">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="text-left p-2">Nombre</th>
+                      <th class="text-left p-2">DNI</th>
+                      <th class="text-left p-2">Estado</th>
+                      <th class="text-left p-2">Asistencia acumulada</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t"><td class="p-2">Laura Torres</td><td class="p-2">44556677</td><td class="p-2">Activo</td><td class="p-2">100%</td></tr>
+                    <tr class="border-t"><td class="p-2">Javier Ríos</td><td class="p-2">66779901</td><td class="p-2">Activo</td><td class="p-2">95%</td></tr>
+                    <tr class="border-t"><td class="p-2">Silvia Castro</td><td class="p-2">77889012</td><td class="p-2">Activo</td><td class="p-2">—</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Calendario de asistencia simplificado -->
+            <div class="bg-white rounded-2xl border p-4">
+              <div class="font-semibold mb-2">Calendario de asistencia</div>
+              <div class="flex items-center gap-3 text-xs mb-3">
+                <span class=\"pill pill--info\">Día de teoría</span>
+                <span class=\"pill pill--success\">Día OJT</span>
+              </div>
+              <div class="overflow-auto">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="p-2 text-left">Fecha</th>
+                      <th class="p-2">L</th><th class="p-2">M</th><th class="p-2">X</th><th class="p-2">J</th><th class="p-2">V</th><th class="p-2">S</th><th class="p-2">D</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="border-t">
+                      <td class="p-2">Semana 1</td>
+                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                    </tr>
+                    <tr class="border-t">
+                      <td class="p-2">Semana 2</td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox" checked/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                      <td class="p-2"><input type="checkbox"/></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button class="mt-3 px-4 py-2 rounded-xl border">Guardar asistencia</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================== NÓMINAS ================== -->
+        <div id="view-nominas" class="view">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-bold">Nóminas / Contabilidad – Aprobados</h2>
+            <button class="px-4 py-2 rounded-xl border">Exportar CSV</button>
+          </div>
+          <div class="overflow-auto rounded-2xl border bg-white">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="text-left p-3">DNI</th>
+                  <th class="text-left p-3">Nombre</th>
+                  <th class="text-left p-3">Puesto</th>
+                  <th class="text-left p-3">Fecha de alta</th>
+                  <th class="text-left p-3">Planilla</th>
+                  <th class="text-left p-3">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t">
+                  <td class="p-3">88888888</td>
+                  <td class="p-3">María Pérez</td>
+                  <td class="p-3">Agente Portabilidad</td>
+                  <td class="p-3">10/08/2025</td>
+                  <td class="p-3"><span class=\"pill pill--warning\">Pendiente</span></td>
+                  <td class="p-3"><button class="px-2 py-1 text-xs rounded-lg border">Enviar a Alta</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // navegación simple entre vistas
+    const buttons = document.querySelectorAll('#nav [data-target]');
+    const views = document.querySelectorAll('.view');
+    function show(id){
+      views.forEach(v=>v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      buttons.forEach(b=>b.classList.remove('bg-blue-600','text-white'));
+      const btn=[...buttons].find(b=>b.dataset.target===id);
+      if(btn){ btn.classList.add('bg-blue-600','text-white'); }
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    buttons.forEach(b=>b.addEventListener('click',()=>show(b.dataset.target)));
+  </script>
+</body>
+</html>
